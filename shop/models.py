@@ -26,7 +26,7 @@ class Product(models.Model):
     objects = None
     id = models.SlugField(max_length=150, primary_key=True, verbose_name='id')
     name = models.CharField(max_length=150, verbose_name='наименование')
-    description = models.CharField(max_length=150, verbose_name='описание')
+    description = models.CharField(max_length=100, verbose_name='описание')
     image_preview = models.ImageField(upload_to='names/', verbose_name='изображение(превью)', **NULLABLE)
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
     purchase_price = models.IntegerField('цена за покупку')
