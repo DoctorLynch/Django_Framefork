@@ -1,7 +1,7 @@
 {% extends 'shop/base.html' %}
 {% block content %}
 
- <div class="container text-center">
+<div class="container text-center" xmlns="">
      {% for object in object_list %}
     <div class="row">
         <div class="col">
@@ -14,6 +14,7 @@
                         <li>{{ object.category }}</li>
                         <li>Цена:{{ object.purchase_price }}$</li>
                         <li>{{ object.description }}</li>
+                        <li><img src="/media/{{ object.image_preview }}"/></li>
                     </ul>
                     <button type="button" class="btn btn-lg btn-block btn-outline-primary">Описание</button>
                 </div>

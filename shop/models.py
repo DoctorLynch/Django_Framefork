@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from sorl.thumbnail import ImageField, get_thumbnail
+
 
 class Category(models.Model):
     objects = None
@@ -26,9 +28,9 @@ class Product(models.Model):
     objects = None
     id = models.SlugField(max_length=150, primary_key=True, verbose_name='id')
     name = models.CharField(max_length=150, verbose_name='наименование')
-    description = models.CharField(max_length=100, verbose_name='описание')
-    image_preview = models.ImageField(upload_to='names/', verbose_name='изображение(превью)', **NULLABLE)
-    category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
+    description = models.CharField(max_length=150, verbose_name='описание')
+    image_preview = models.ImageField(upload_to=None, height_field=None, width_field=None, max_length=1, **NULLABLE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
     purchase_price = models.IntegerField('цена за покупку')
     date_creation = models.DateField(max_length=150, verbose_name='дата создания')
     date_last_mod = models.DateField(max_length=150, verbose_name='дата последнего изменения')

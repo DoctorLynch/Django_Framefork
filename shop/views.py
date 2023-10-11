@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from shop.models import Product
+from shop.models import Product, Category
 
 
 def products(request):
@@ -12,14 +12,19 @@ def products(request):
     return render(request, 'shop/products.html', context)
 
 
-def contact(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        print(f'{name} ({email}): {message}')
-
+def category(request):
+    category_list = Category.objects.all()
     context = {
-        'title': 'Контакты'
+        'object_list': category_list,
+        'title': 'Категории'
     }
-    return render(request, 'shop/contacts.html', context)
+    return render(request, 'shop/category.html', context)
+
+
+def category_products(request, pk):
+    category_item = Category.objects.get(pk=pk)
+    context = {
+        'object_list': Product.objects.filter(category_id=pk),
+        'title': f'Категория - {category_item.name}'
+    }
+    return render(request, 'shop/products.html', context)
