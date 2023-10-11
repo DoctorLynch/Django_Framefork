@@ -1,6 +1,6 @@
 {% extends 'shop/base.html' %}
+{% load my_tags %}
 {% block content %}
-
 <div class="container text-center" xmlns="">
      {% for object in object_list %}
     <div class="row">
@@ -14,7 +14,7 @@
                         <li>{{ object.category }}</li>
                         <li>Цена:{{ object.purchase_price }}$</li>
                         <li>{{ object.description }}</li>
-                        <li><img src="/media/{{ object.image_preview }}"/></li>
+                        <li><img src="{{ object.image_preview|mymedia }}"/></li>
                     </ul>
                     <button type="button" class="btn btn-lg btn-block btn-outline-primary">Описание</button>
                 </div>
