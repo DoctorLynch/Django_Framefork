@@ -1,13 +1,8 @@
-import uuid
-
 from django.db import models
-
-from sorl.thumbnail import ImageField, get_thumbnail
 
 
 class Category(models.Model):
     objects = None
-    id = models.SlugField(max_length=150, primary_key=True, verbose_name='id')
     name = models.CharField(max_length=150, verbose_name='наименование')
     description = models.CharField(max_length=150, verbose_name='описание')
 
@@ -26,10 +21,9 @@ NULLABLE = {'blank': True, 'null': True}
 
 class Product(models.Model):
     objects = None
-    id = models.SlugField(max_length=150, primary_key=True, verbose_name='id')
     name = models.CharField(max_length=150, verbose_name='наименование')
     description = models.CharField(max_length=150, verbose_name='описание')
-    image_preview = models.ImageField(upload_to=None, height_field=None, width_field=None, max_length=1, **NULLABLE)
+    image_preview = models.ImageField(upload_to='image', height_field=None, width_field=None, max_length=1, **NULLABLE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
     purchase_price = models.IntegerField('цена за покупку')
     date_creation = models.DateField(max_length=150, verbose_name='дата создания')
@@ -43,3 +37,22 @@ class Product(models.Model):
         verbose_name = 'Товар'  # Настройка для наименования одного объекта
         verbose_name_plural = 'Товары'  # Настройка для наименования набора объектов
         ordering = ('name',)
+
+
+class Blogs(models.Model):
+    objects = None
+    title = models.CharField(max_length=150, verbose_name='наименование')
+    slug = models.CharField(max_length=150, verbose_name='slug', null=True, blank=True)
+    content = models.CharField(max_length=150, verbose_name='содержимое')
+    image_preview = models.ImageField(upload_to='image_blogs', height_field=None, width_field=None, max_length=1, **NULLABLE)
+    creation_date = models.DateField(max_length=150, verbose_name='дата создания')
+    publication_attribute = models.BooleanField(default=True, verbose_name='признак публикации')
+    number_of_views = models.IntegerField(default=0, verbose_name='количество просмотров')
+
+    def __str__(self):
+        # Строковое отображение объекта
+        return f'{self.title}'
+
+    class Meta:
+        verbose_name = 'Блог'  # Настройка для наименования одного объекта
+        verbose_name_plural = 'Блоги'  # Настройка для наименования набора объектов

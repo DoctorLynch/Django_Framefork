@@ -1,0 +1,23 @@
+{% extends 'shop/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="container text-center" xmlns="">
+    <a href="{% url 'shop:create_blogs' %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Добавить блог</a>
+     {% for object in object_list %}
+    <div class="row">
+        <div class="col">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">{{ object }}</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4 text-start m-3 ">
+                        <li><img src="{{ object.image_preview|mymedia }}" class="img-fluid"/></li>
+                    </ul>
+                    <a href="{% url 'shop:view_blogs' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Описание</a>
+                    <a href="{% url 'shop:delete_blogs' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Удалить</a>
+                    <a href="{% url 'shop:edit_blogs' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Изменить</a>
+                </div>
+            </div>
+            {% endfor %}
+   {% endblock %}
