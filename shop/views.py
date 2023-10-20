@@ -1,9 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
-from shop.models import Product, Category, Blogs
+from shop.forms import ProductForm
+from shop.models import Product, Category, Blogs, Version
 
 
 class ProductListView(ListView):
@@ -35,9 +37,14 @@ def category_products(request, pk):
     return render(request, 'shop/products.html', context)
 
 
+# class ProductCreateView(CreateView):
+#     model = Product
+#     fields = '__all__'
+#     success_url = reverse_lazy('shop:list')
+
 class ProductCreateView(CreateView):
     model = Product
-    fields = '__all__'
+    form_class = ProductForm
     success_url = reverse_lazy('shop:list')
 
 
@@ -71,7 +78,7 @@ class BlogsDetailView(DetailView):
 
 class ProductUpdateView(UpdateView):
     model = Product
-    fields = '__all__'
+    form_class = ProductForm
     success_url = reverse_lazy('shop:list')
 
 
@@ -93,7 +100,6 @@ class BlogsUpdateView(UpdateView):
         return reverse('shop:view_blogs', args=[self.kwargs.get('pk')])
 
 
-
 class ProductDeleteView(DeleteView):
     model = Product
     fields = '__all__'
@@ -104,3 +110,13 @@ class BlogsDeleteView(DeleteView):
     model = Blogs
     fields = '__all__'
     success_url = reverse_lazy('shop:list_blogs')
+
+
+class VersionCreateView(LoginRequiredMixin, CreateView):
+    model = Version
+
+    def form_valid(self, form):
+        product_pk = self.kwargs['pk']  # Получаем pk продукта из URL
+        product = Product.objects.get(pk=product_pk)  # Получаем объект продукта
+        form.instance.product = product  # Устанавливаем продукт в поле версии
+        return super().form_valid(form)
