@@ -45,7 +45,8 @@ class Blogs(models.Model):
     title = models.CharField(max_length=150, verbose_name='наименование')
     slug = models.CharField(max_length=150, verbose_name='slug', null=True, blank=True)
     content = models.CharField(max_length=150, verbose_name='содержимое')
-    image_preview = models.ImageField(upload_to='image_blogs', height_field=None, width_field=None, max_length=1,**NULLABLE)
+    image_preview = models.ImageField(upload_to='image_blogs', height_field=None, width_field=None, max_length=1,
+                                      **NULLABLE)
     creation_date = models.DateField(max_length=150, verbose_name='дата создания')
     publication_attribute = models.BooleanField(default=True, verbose_name='признак публикации')
     number_of_views = models.IntegerField(default=0, verbose_name='количество просмотров')
@@ -61,13 +62,13 @@ class Blogs(models.Model):
 
 class Version(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт')
-    num_of_version = models.IntegerField(default=1, verbose_name='номер текущей версии')
+    num_of_version = models.IntegerField(default=1, verbose_name='номер текущей версии', unique=True, **NULLABLE)
     name_version = models.CharField(max_length=150, verbose_name='название версии')
     flag_of_version = models.BooleanField(default=True, verbose_name='признак версии')
 
     def __str__(self):
         # Строковое отображение объекта
-        return f'{self.product}'
+        return f'{self.product} {self.flag_of_version} {self.num_of_version} {self.name_version}'
 
     class Meta:
         verbose_name = 'Версия'  # Настройка для наименования одного объекта

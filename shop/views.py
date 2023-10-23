@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import inlineformset_factory
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
-from shop.forms import ProductForm
+from shop.forms import ProductForm, VersionForm
 from shop.models import Product, Category, Blogs, Version
 
 
@@ -81,6 +82,26 @@ class ProductUpdateView(UpdateView):
     form_class = ProductForm
     success_url = reverse_lazy('shop:list')
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        VersionFromset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
+        if self.request.method == 'POST':
+            context_data['formset'] = VersionFromset(self.request.POST, instance=self.object)
+        else:
+            context_data['formset'] = VersionFromset(instance=self.object)
+        return context_data
+
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+        self.object = form.save()
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+        
+        return super().form_valid(form)
+
+
+
 
 class BlogsUpdateView(UpdateView):
     model = Blogs
@@ -120,3 +141,5 @@ class VersionCreateView(LoginRequiredMixin, CreateView):
         product = Product.objects.get(pk=product_pk)  # Получаем объект продукта
         form.instance.product = product  # Устанавливаем продукт в поле версии
         return super().form_valid(form)
+
+
