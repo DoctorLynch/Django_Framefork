@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -29,6 +30,7 @@ class Product(models.Model):
     purchase_price = models.IntegerField('цена за покупку')
     date_creation = models.DateField(max_length=150, verbose_name='дата создания')
     date_last_mod = models.DateField(max_length=150, verbose_name='дата последнего изменения')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, verbose_name='владелец')
 
     def __str__(self):
         # Строковое отображение объекта

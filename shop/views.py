@@ -32,21 +32,23 @@ class CategoryListView(ListView):
 def category_products(request, pk):
     category_item = Category.objects.get(pk=pk)
     context = {
-        'object_list': Product.objects.filter(category_id=pk),
+        'object_list': Product.objects.filter(category_id=pk, owner=request.user),
         'title': f'Категория - {category_item.name}'
     }
     return render(request, 'shop/products.html', context)
 
 
-# class ProductCreateView(CreateView):
-#     model = Product
-#     fields = '__all__'
-#     success_url = reverse_lazy('shop:list')
-
 class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('shop:list')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+        
+        return super().form_valid(form)
 
 
 class BlogsCreateView(CreateView):
