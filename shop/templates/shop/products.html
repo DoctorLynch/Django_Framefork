@@ -1,24 +1,33 @@
 {% extends 'shop/base.html' %}
 {% load my_tags %}
 {% block content %}
-<div class="container text-center" xmlns="">
-    <div class="col-12 mb-5">
-       <a class="btn btn-outline-primary" href="{% url 'shop:create' %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Добавить товар</a>
-     {% for object in object_list %}
-    <div class="row">
-        <div class="col">
-            <div class="card mb-4 box-shadow">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">{{ object }}</h4>
+{% if request.user.is_authenticated %}
+    <div class="container text-center" xmlns="">
+        <div class="col-12 mb-5">
+           <a class="btn btn-outline-primary" href="{% url 'shop:create' %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Добавить товар</a>
+         {% for object in object_list %}
+        <div class="row">
+            <div class="col">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">{{ object }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4 text-start m-3 ">
+                            <li><img src="{{ object.image_preview|mymedia }}" class="img-fluid"/></li>
+                        </ul>
+                        <a href="{% url 'shop:view' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Описание</a>
+                        <a href="{% url 'shop:delete' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Удалить</a>
+                        <a href="{% url 'shop:edit' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Изменить</a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mt-3 mb-4 text-start m-3 ">
-                        <li><img src="{{ object.image_preview|mymedia }}" class="img-fluid"/></li>
-                    </ul>
-                    <a href="{% url 'shop:view' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Описание</a>
-                    <a href="{% url 'shop:delete' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Удалить</a>
-                    <a href="{% url 'shop:edit' object.pk %}"  type="button" class="btn btn-lg btn-block btn-outline-primary">Изменить</a>
-                </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+                {% else %}
+    <div class="col-12">
+            <form class="row-3">
+                <div class="col-3">
+                    <div class="card">
+   <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
+   <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">Зарегистрироваться</a>
+{% endif %}
    {% endblock %}

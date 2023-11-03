@@ -1,12 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
-from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
 from shop.forms import ProductForm, VersionForm
-from shop.models import Product, Category, Blogs, Version
+from shop.models import Product, Blogs, Version
 
 
 class ProductListView(ListView):
@@ -22,20 +21,6 @@ class BlogsListView(ListView):
         queryset = super().get_queryset(*args, **kwargs)
         queryset = queryset.filter(publication_attribute=True)
         return queryset
-
-
-class CategoryListView(ListView):
-    model = Category
-    template_name = 'shop/category.html'
-
-
-def category_products(request, pk):
-    category_item = Category.objects.get(pk=pk)
-    context = {
-        'object_list': Product.objects.filter(category_id=pk, owner=request.user),
-        'title': f'Категория - {category_item.name}'
-    }
-    return render(request, 'shop/products.html', context)
 
 
 class ProductCreateView(CreateView):

@@ -2,21 +2,6 @@ from django.conf import settings
 from django.db import models
 
 
-class Category(models.Model):
-    objects = None
-    name = models.CharField(max_length=150, verbose_name='наименование')
-    description = models.CharField(max_length=150, verbose_name='описание')
-
-    def __str__(self):
-        # Строковое отображение объекта
-        return f'{self.name}'
-
-    class Meta:
-        verbose_name = 'Категория'  # Настройка для наименования одного объекта
-        verbose_name_plural = 'Категории'  # Настройка для наименования набора объектов
-        ordering = ('name',)
-
-
 NULLABLE = {'blank': True, 'null': True}
 
 
@@ -26,7 +11,6 @@ class Product(models.Model):
     description = models.CharField(max_length=150, verbose_name='описание')
     image_preview = models.ImageField(upload_to='image', height_field=None, width_field=None, max_length=100,
                                       **NULLABLE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
     purchase_price = models.IntegerField('цена за покупку')
     date_creation = models.DateField(max_length=150, verbose_name='дата создания')
     date_last_mod = models.DateField(max_length=150, verbose_name='дата последнего изменения')
