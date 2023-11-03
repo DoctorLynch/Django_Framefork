@@ -5,9 +5,12 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
+from django.utils.timezone import now
 from django.views.generic import CreateView, UpdateView
+
+from config.settings import CODE_EXPIRATION
 from users.forms import UserRegisterForm, UserProfileForm
-from users.models import User
+from users.models import User, ConfirmationCode
 
 
 class RegisterView(CreateView):
@@ -27,7 +30,8 @@ class RegisterView(CreateView):
                 subject='Поздравляем с регистрацией',
                 message=f'Вы зарегистрировались на нашей платформе, ваш код авторизации {verification_code}',
                 from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[self.object.email]
+                recipient_list=[self.object.email],
+                fail_silently=False
             )
         return super().form_valid(form)
 
@@ -54,12 +58,13 @@ def generate_new_password(request):
     return redirect(reverse('shop:list'))
 
 
-def mail_verification(request):
-    verification_code = User.verification_code
+def verify_code(request):
     if request.method == 'POST':
-        user_code = request.POST.get('user_code')
-        if user_code == verification_code:
-            User.is_active = True
-
+        code = request.POST.get('code')
+        user = request.user
+        confirmation_code = ConfirmationCode.objects.filter(user=user, code=code).first()
+        if confirmation_code and now() - confirmation_code.created_at < CODE_EXPIRATION:
+            # Процесс успешной аутентификации пользователя
+            confirmation_code.delete()
+            return redirect('success')
     return render(request, 'users/verification.html')
-
