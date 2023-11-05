@@ -10,20 +10,20 @@ from django.views.generic import CreateView, UpdateView
 
 from config.settings import CODE_EXPIRATION
 from users.forms import UserRegisterForm, UserProfileForm
-from users.models import User, ConfirmationCode
+from users.models import User
 
 
 class RegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('users:verification')
+    success_url = reverse_lazy('users:verify_email')
 
     def form_valid(self, form):
         self.object = form.save()
         if form.is_valid():
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(12)])
-            self.object.verification_code = verification_code
+            self.object.verify_code = verification_code
             self.object.is_active = False
             self.object.save()
             send_mail(
@@ -31,7 +31,6 @@ class RegisterView(CreateView):
                 message=f'Вы зарегистрировались на нашей платформе, ваш код авторизации {verification_code}',
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[self.object.email],
-                fail_silently=False
             )
         return super().form_valid(form)
 
@@ -58,13 +57,12 @@ def generate_new_password(request):
     return redirect(reverse('shop:list'))
 
 
-def verify_code(request):
+def verify_email(request, email):
     if request.method == 'POST':
         code = request.POST.get('code')
-        user = request.user
-        confirmation_code = ConfirmationCode.objects.filter(user=user, code=code).first()
-        if confirmation_code and now() - confirmation_code.created_at < CODE_EXPIRATION:
-            # Процесс успешной аутентификации пользователя
-            confirmation_code.delete()
+        user = User.objects.get(email=email)
+        if user.verification_code == code:
+            user.is_active = True
+            user.save()
             return redirect('success')
     return render(request, 'users/verification.html')
