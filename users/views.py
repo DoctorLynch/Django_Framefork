@@ -1,14 +1,9 @@
 import random
-
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
-from django.utils.timezone import now
 from django.views.generic import CreateView, UpdateView
-
-from config.settings import CODE_EXPIRATION
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User
 
@@ -17,7 +12,9 @@ class RegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('users:verify_email')
+
+    def get_success_url(self):
+        return reverse('users:verify_email', kwargs={'email': self.object.email})
 
     def form_valid(self, form):
         self.object = form.save()
@@ -61,8 +58,8 @@ def verify_email(request, email):
     if request.method == 'POST':
         code = request.POST.get('code')
         user = User.objects.get(email=email)
-        if user.verification_code == code:
-            user.is_active = True
+        if user.verify_code == code:
+            User.is_active = True
             user.save()
-            return redirect('success')
+            return redirect(reverse('shop:list'))
     return render(request, 'users/verification.html')
