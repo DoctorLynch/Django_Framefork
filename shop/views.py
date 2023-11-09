@@ -32,7 +32,7 @@ class ProductCreateView(CreateView):
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
-        
+
         return super().form_valid(form)
 
 
@@ -84,10 +84,8 @@ class ProductUpdateView(UpdateView):
         if formset.is_valid():
             formset.instance = self.object
             formset.save()
-        
+
         return super().form_valid(form)
-
-
 
 
 class BlogsUpdateView(UpdateView):
@@ -128,5 +126,3 @@ class VersionCreateView(LoginRequiredMixin, CreateView):
         product = Product.objects.get(pk=product_pk)  # Получаем объект продукта
         form.instance.product = product  # Устанавливаем продукт в поле версии
         return super().form_valid(form)
-
-

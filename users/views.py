@@ -1,5 +1,6 @@
 import random
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
@@ -32,7 +33,7 @@ class RegisterView(CreateView):
         return super().form_valid(form)
 
 
-class ProfileView(UpdateView):
+class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
     success_url = reverse_lazy('users:profile')
@@ -56,10 +57,11 @@ def generate_new_password(request):
 
 def verify_email(request, email):
     if request.method == 'POST':
-        code = request.POST.get('code')
+        code = request.POST.get('user-code')
         user = User.objects.get(email=email)
         if user.verify_code == code:
-            User.is_active = True
+            user.is_active = True
+            user.is_staff = True
             user.save()
             return redirect(reverse('shop:list'))
     return render(request, 'users/verification.html')
