@@ -1,5 +1,6 @@
 import random
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
@@ -42,6 +43,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
+@login_required
 def generate_new_password(request):
     new_password = ''.join([str(random.randint(0, 9)) for _ in range(12)])
     send_mail(
@@ -61,7 +63,6 @@ def verify_email(request, email):
         user = User.objects.get(email=email)
         if user.verify_code == code:
             user.is_active = True
-            user.is_staff = True
             user.save()
             return redirect(reverse('shop:list'))
     return render(request, 'users/verification.html')

@@ -8,12 +8,15 @@ from shop.forms import ProductForm, VersionForm
 from shop.models import Product, Blogs, Version
 
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'shop/products.html'
 
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published=True)
 
-class BlogsListView(ListView):
+
+class BlogsListView(LoginRequiredMixin, ListView):
     model = Blogs
     template_name = 'shop/blogs.html'
 
@@ -23,7 +26,7 @@ class BlogsListView(ListView):
         return queryset
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('shop:list')
@@ -36,7 +39,7 @@ class ProductCreateView(CreateView):
         return super().form_valid(form)
 
 
-class BlogsCreateView(CreateView):
+class BlogsCreateView(LoginRequiredMixin, CreateView):
     model = Blogs
     fields = '__all__'
     success_url = reverse_lazy('shop:list_blogs')
@@ -50,11 +53,11 @@ class BlogsCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
 
 
-class BlogsDetailView(DetailView):
+class BlogsDetailView(LoginRequiredMixin, DetailView):
     model = Blogs
 
     def get_object(self, queryset=None):
@@ -64,10 +67,13 @@ class BlogsDetailView(DetailView):
         return self.object
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('shop:list')
+
+    def get_queryset(self):
+        return super().get_queryset().filter(owner=self.request.user)
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -88,7 +94,7 @@ class ProductUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class BlogsUpdateView(UpdateView):
+class BlogsUpdateView(LoginRequiredMixin, UpdateView):
     model = Blogs
     fields = '__all__'
 
@@ -106,13 +112,13 @@ class BlogsUpdateView(UpdateView):
         return reverse('shop:view_blogs', args=[self.kwargs.get('pk')])
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     fields = '__all__'
     success_url = reverse_lazy('shop:list')
 
 
-class BlogsDeleteView(DeleteView):
+class BlogsDeleteView(LoginRequiredMixin, DeleteView):
     model = Blogs
     fields = '__all__'
     success_url = reverse_lazy('shop:list_blogs')

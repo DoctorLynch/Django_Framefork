@@ -21,4 +21,4 @@ class BlogsAdmin(admin.ModelAdmin):
 class VersionAdmin(admin.ModelAdmin):
     list_display = ('product', 'flag_of_version')
     list_filter = ('product',)
-    search_fields = ('product', )
+    search_fields = ('product',)

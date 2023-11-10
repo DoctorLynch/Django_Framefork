@@ -15,6 +15,7 @@ class Product(models.Model):
     date_creation = models.DateField(max_length=150, verbose_name='дата создания')
     date_last_mod = models.DateField(max_length=150, verbose_name='дата последнего изменения')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, verbose_name='владелец')
+    is_published = models.BooleanField(default=False, verbose_name='признак публикации')
 
     def __str__(self):
         # Строковое отображение объекта
@@ -23,7 +24,12 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Товар'  # Настройка для наименования одного объекта
         verbose_name_plural = 'Товары'  # Настройка для наименования набора объектов
-        ordering = ('name',)
+        permissions = [
+            (
+                'set_published',
+                'Can publish posts'
+            ),
+        ]
 
 
 class Blogs(models.Model):

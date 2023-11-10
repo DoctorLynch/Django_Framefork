@@ -139,5 +139,4 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'Doctor-Lynch@yandex.ru'
 
-CODE_LENGTH = 6  # Длина уникального кода
-CODE_EXPIRATION = 15  # Время жизни уникального кода в минутах
+LOGIN_URL = '/users/'
