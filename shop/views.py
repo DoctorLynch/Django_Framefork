@@ -1,11 +1,28 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.urls import reverse_lazy, reverse
+from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
 from shop.forms import ProductForm, VersionForm
-from shop.models import Product, Blogs, Version
+from shop.models import Product, Category, Blogs, Version
+
+
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = 'shop/category.html'
+
+
+@login_required
+def category_products(request, pk):
+    category_item = Category.objects.get(pk=pk)
+    context = {
+        'object_list': Product.objects.filter(category_id=pk),
+        'title': f'Категория - {category_item.name}'
+    }
+    return render(request, 'shop/products.html', context)
 
 
 class ProductListView(LoginRequiredMixin, ListView):
