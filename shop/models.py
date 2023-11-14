@@ -78,7 +78,7 @@ class Version(models.Model):
 
     def __str__(self):
         # Строковое отображение объекта
-        return f'{self.product} {self.flag_of_version} {self.num_of_version} {self.name_version}'
+        return f'{self.product} {self.name_version}'
 
     class Meta:
         verbose_name = 'Версия'  # Настройка для наименования одного объекта

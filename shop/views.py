@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.cache import cache
 from django.forms import inlineformset_factory
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render
@@ -8,11 +10,17 @@ from pytils.translit import slugify
 
 from shop.forms import ProductForm, VersionForm
 from shop.models import Product, Category, Blogs, Version
+from shop.services import get_cached_category_list
 
 
 class CategoryListView(LoginRequiredMixin, ListView):
     model = Category
     template_name = 'shop/category.html'
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['categories'] = get_cached_category_list
+        return context_data
 
 
 @login_required
@@ -70,8 +78,23 @@ class BlogsCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductDetailView(LoginRequiredMixin, DetailView):
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Product
+    permission_required = 'shop.view_product'
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        if settings.CACHE_ENABLE:
+            key = f'version_list_{self.object.pk}'
+            version_list = cache.get(key)
+            if version_list is None:
+                version_list = self.object.version_set.all()
+                cache.set(key, version_list)
+        else:
+            version_list = self.object.version_set.all()
+
+        context_data['versions'] = version_list
+        return context_data
 
 
 class BlogsDetailView(LoginRequiredMixin, DetailView):
